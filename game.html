@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>موبايلك على رأسك</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .word {
+      font-size: 2rem;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+    .buttons {
+      display: flex;
+      gap: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+    }
+    button.correct {
+      background-color: #4CAF50;
+      color: white;
+    }
+    button.skip {
+      background-color: #f44336;
+      color: white;
+    }
+    .timer {
+      font-size: 1.5rem;
+      margin: 10px 0;
+    }
+    .result {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="timer">الوقت المتبقي: <span id="timer">30</span> ثانية</div>
+    <div class="word" id="word">اضغط لبدء اللعبة</div>
+    <div class="buttons">
+      <button class="correct" onclick="correct()">صح</button>
+      <button class="skip" onclick="skip()">تخطي</button>
+    </div>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    const words = [
+      "تنمية العقل و التفكير المنطقي",
+      "إعداد الإنسان للحياة العملية",
+      "غرس الفضائل الأخلاقية",
+      "تعزيز الإيمان بالعقل و العلم"
+    ];
+
+    let currentWordIndex = -1;
+    let score = 0;
+    let timer;
+    let timeLeft = 30;
+
+    function startGame() {
+      console.log("بدء اللعبة");
+      score = 0;
+      currentWordIndex = -1;
+      timeLeft = 30;
+      document.getElementById('result').innerText = '';
+      document.getElementById('timer').innerText = timeLeft;
+      nextWord();
+      startTimer();
+      listenForTilt();
+    }
+
+    function nextWord() {
+      currentWordIndex++;
+      if (currentWordIndex < words.length) {
+        document.getElementById('word').innerText = words[currentWordIndex];
+        console.log(`الكلمة الحالية: ${words[currentWordIndex]}`);
+      } else {
+        endGame();
+      }
+    }
+
+    function correct() {
+      console.log("إجابة صحيحة");
+      score++;
+      nextWord();
+    }
+
+    function skip() {
+      console.log("تخطي الكلمة");
+      nextWord();
+    }
+
+    function startTimer() {
+      console.log("تشغيل المؤقت");
+      clearInterval(timer);
+      timer = setInterval(() => {
+        if (timeLeft > 0) {
+          timeLeft--;
+          document.getElementById('timer').innerText = timeLeft;
+          console.log(`الوقت المتبقي: ${timeLeft}`);
+        } else {
+          clearInterval(timer);
+          endGame();
+        }
+      }, 1000);
+    }
+
+    function endGame() {
+      console.log("انتهاء اللعبة");
+      document.getElementById('word').innerText = 'انتهت اللعبة!';
+      document.getElementById('result').innerText = `الإجابات الصحيحة: ${score}`;
+      clearInterval(timer);
+    }
+
+    function listenForTilt() {
+      window.addEventListener('deviceorientation', (event) => {
+        const beta = event.beta; // Tilt forward/backward
+
+        if (beta > 45) { // Tilt forward
+          correct();
+        } else if (beta < -45) { // Tilt backward
+          skip();
+        }
+      });
+    }
+
+    // Start the game on page load
+    document.getElementById('word').addEventListener('click', startGame);
+  </script>
+</body>
+</html>
